@@ -15,7 +15,7 @@ export default function errorHandler(
     status: string;
     success: boolean;
     message: string;
-    stack: string;
+    stack?: string;
   };
 
   const response: LastResponse = {
