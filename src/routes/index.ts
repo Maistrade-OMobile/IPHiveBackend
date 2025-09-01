@@ -7,11 +7,9 @@ const router = Router();
 router.get("/", (req, res) => {
   res.json({
     status: "success",
-    message: "Backend is up and running",
+    message: "Backend is up and running"
   });
 });
-
-
 
 router.get("/waitlist", async (req, res, next) => {
   try {
@@ -27,8 +25,6 @@ router.get("/waitlist", async (req, res, next) => {
   }
 });
 
-
-
 router.post("/waitlist", async (req, res, next) => {
   try {
     if (!req.body) {
@@ -38,22 +34,20 @@ router.post("/waitlist", async (req, res, next) => {
       });
     }
 
-    const { name, emailAddress, role } = req.body;
+    const { fullName, emailAddress, role } = req.body;
 
-    if (!name || !emailAddress || !role) {
+    if (!fullName || !emailAddress || !role) {
       return res.status(400).json({
         success: false,
         message: "Incomplete request - emailAddress, name or role not provided"
       });
     }
 
-    const waitlistUser = await Waitlist.findOneAndUpdate(
-      { emailAddress },
-      {
-        $setOnInsert: { name, emailAddress, role }
-      },
-      { new: true }
-    );
+    let waitlistUser = await Waitlist.findOne({ emailAddress });
+    if (!waitlistUser) {
+      waitlistUser = new Waitlist({ fullName, emailAddress, role });
+      await waitlistUser.save();
+    }
 
     return res.status(201).json({
       success: true,
@@ -66,6 +60,3 @@ router.post("/waitlist", async (req, res, next) => {
 });
 
 export default router;
-
-
-
