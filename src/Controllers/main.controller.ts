@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import Waitlist from "../models/waitlist.model";
 
-export const getWaitlist = async (
+export const getWaitlists = async (
   req: Request,
   res: Response,
   next: NextFunction
