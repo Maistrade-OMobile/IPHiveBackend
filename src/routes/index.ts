@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { getWaitlists, postWaitlist } from "../Controllers/main.controller";
+import {
+  getWaitlists,
+  createWaitlist
+} from "../controllers/waitlist.controller";
 
 const router = Router();
 
@@ -13,6 +16,6 @@ router.get("/", (req, res) => {
 
 router.get("/waitlists", getWaitlists);
 
-router.post("/waitlist", postWaitlist);
+router.post("/waitlist", createWaitlist);
 
 export default router;

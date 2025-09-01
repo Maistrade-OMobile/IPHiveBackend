@@ -19,7 +19,7 @@ export const getWaitlists = async (
   }
 };
 
-export const postWaitlist = async (
+export const createWaitlist = async (
   req: Request,
   res: Response,
   next: NextFunction
