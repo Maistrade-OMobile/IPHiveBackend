@@ -6,7 +6,7 @@ export default function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.error("Error:", err);
+  // console.error("Error:", err);
 
   const status = err.statusCode || err.status || 500;
 
@@ -35,6 +35,5 @@ export default function errorHandler(
     response.stack = err.stack;
   }
 
-  console.error(err);
   return res.status(status).json(response);
 }
