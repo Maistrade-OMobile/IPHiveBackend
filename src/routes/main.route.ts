@@ -4,31 +4,6 @@ import Waitlist from "../models/waitlist.model";
 const router = Router();
 
 // Health check
-router.get("/", (req, res) => {
-  res.json({
-    status: "success",
-    message: "Backend is up and running",
-  });
-});
-
-
-
-router.get("/waitlist", async (req, res, next) => {
-  try {
-    const waitlistUsers = await Waitlist.find({}).sort({ createdAt: -1 });
-
-    return res.status(200).json({
-      success: true,
-      message: "waitlist users retrieved",
-      data: waitlistUsers
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
-
-
 router.post("/waitlist", async (req, res, next) => {
   try {
     if (!req.body) {
@@ -65,7 +40,18 @@ router.post("/waitlist", async (req, res, next) => {
   }
 });
 
+router.get("/waitlist", async (req, res, next) => {
+  try {
+    const waitlistUsers = await Waitlist.find({}).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      message: "waitlist users retrieved",
+      data: waitlistUsers
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
-
-
-
