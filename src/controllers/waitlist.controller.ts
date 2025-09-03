@@ -32,7 +32,7 @@ export const createWaitlist = async (
       });
     }
 
-    const { fullName, emailAddress, role, receiveEmailUpdates } = req.body;
+    const { fullName, emailAddress, role, emailUpdates } = req.body;
 
     if (!fullName || !emailAddress || !role) {
       return res.status(400).json({
@@ -41,20 +41,17 @@ export const createWaitlist = async (
       });
     }
     
- // Validate receiveEmailUpdates is a boolean
-    if (typeof receiveEmailUpdates !== "boolean") {
+    if (typeof emailUpdates !== "boolean") {
       return res.status(400).json({
         success: false,
-        message: "Invalid request - receiveEmailUpdates must be a boolean"
+        message: "Invalid request - emailUpdates must be a boolean"
       });
-
     }
 
-    const emailUpdatesPreference = receiveEmailUpdates;
 
     let waitlistUser = await Waitlist.findOne({ emailAddress });
     if (!waitlistUser) {
-      waitlistUser = new Waitlist({ fullName, emailAddress, role, receiveEmailUpdates: emailUpdatesPreference });
+      waitlistUser = new Waitlist({ fullName, emailAddress, role, emailUpdates });
       await waitlistUser.save();
     }
 
