@@ -4,7 +4,7 @@ interface WaitlistEntry extends Document {
   fullName: string;
   emailAddress: string;
   role: "innovator" | "investor";
-  emailUpdates : boolean; 
+  receiveEmailUpdates : boolean; 
 }
 
 const waitlistSchema = new Schema<WaitlistEntry>(
@@ -24,7 +24,7 @@ const waitlistSchema = new Schema<WaitlistEntry>(
       enum: ["innovator", "investor"]
       // default: "innovator"
     },
-    emailUpdates: {
+    receiveEmailUpdates: {
       type: Boolean,
       default: false
     }
