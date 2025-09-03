@@ -41,9 +41,16 @@ export const createWaitlist = async (
       });
     }
     
-    //Checks if user wants email updates (loose equality) 
-    const emailUpdatesPreference = receiveEmailUpdates == 'true';
+ // Validate receiveEmailUpdates is a boolean
+    if (typeof receiveEmailUpdates !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request - receiveEmailUpdates must be a boolean"
+      });
 
+    }
+
+    const emailUpdatesPreference = receiveEmailUpdates;
 
     let waitlistUser = await Waitlist.findOne({ emailAddress });
     if (!waitlistUser) {
