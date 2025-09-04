@@ -32,7 +32,7 @@ export const createWaitlist = async (
       });
     }
 
-    const { fullName, emailAddress, role } = req.body;
+    const { fullName, emailAddress, role, receiveEmailUpdates } = req.body;
 
     if (!fullName || !emailAddress || !role) {
       return res.status(400).json({
@@ -40,10 +40,18 @@ export const createWaitlist = async (
         message: "Incomplete request - emailAddress, name or role not provided"
       });
     }
+    
+    if (typeof receiveEmailUpdates !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request - receiveEmailUpdates must be a boolean"
+      });
+    }
+
 
     let waitlistUser = await Waitlist.findOne({ emailAddress });
     if (!waitlistUser) {
-      waitlistUser = new Waitlist({ fullName, emailAddress, role });
+      waitlistUser = new Waitlist({ fullName, emailAddress, role, receiveEmailUpdates });
       await waitlistUser.save();
     }
 
