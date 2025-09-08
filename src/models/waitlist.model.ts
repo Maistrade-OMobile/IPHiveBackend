@@ -2,7 +2,7 @@ import { Schema, model, Document } from "mongoose";
 
 interface WaitlistEntry extends Document {
   fullName: string;
-  emailAddress: string;
+  email: string;
   role: "innovator" | "investor";
   receiveEmailUpdates : boolean; 
 }
@@ -13,7 +13,7 @@ const waitlistSchema = new Schema<WaitlistEntry>(
       type: String,
       required: true
     },
-    emailAddress: {
+    email: {
       type: String,
       required: true,
       unique: true

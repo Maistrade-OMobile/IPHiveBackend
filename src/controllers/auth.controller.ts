@@ -8,28 +8,32 @@ export const registerUser = async (
   next: NextFunction
 ) => {
   try {
-    const { fullName, emailAddress, password, role } = req.body;
+    const { fullName, email, password, role } = req.body;
 
-    const existing = await User.findOne({ emailAddress });
+    const existing = await User.findOne({ email });
     if (existing) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({
+         success: false,
+         message: "Email already registered"
+      });
     }
 
     const hashed = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       fullName,
-      emailAddress,
+      email,
       role: role,
       password: hashed,
     });
 
     res.status(201).json({
+      success: true,
       message: "User registered successfully",
       user: {
         id: user._id,
         fullName: user.fullName,
-        emailAddress: user.emailAddress,
+        email: user.email,
         role: user.role,
       },
     });
@@ -45,25 +49,32 @@ export const loginUser = async (
   next: NextFunction
 ) => {
   try {
-    const { emailAddress, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ emailAddress });
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email or password" 
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password || "");
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email or password" 
+      });
     }
 
     // ( pending ) -> generate JWT
     res.json({
+      success: true,
       message: "Login successful",
       user: {
         id: user._id,
         fullName: user.fullName,
-        emailAddress: user.emailAddress,
+        email: user.email,
       },
     });
   } catch (err) {
@@ -77,11 +88,14 @@ export const sendResetEmail = async (
   next: NextFunction
 ) => {
   try {
-    const { emailAddress } = req.body;
+    const { email } = req.body;
 
-    const user = await User.findOne({ emailAddress });
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "No user with this email" });
+      return res.status(400).json({
+        success: false,
+        message: "No user with this email"
+      });
     }
 
     const token = Math.random().toString(36).substring(2);
@@ -90,7 +104,10 @@ export const sendResetEmail = async (
     await user.save();
 
     // ( Pending ) -> Email Logic
-    res.json({ message: "Password reset email sent", token });
+    res.json({
+       success: true,
+       message: "Password reset email sent", token 
+      });
   } catch (err) {
     next(err);
   }
@@ -110,10 +127,16 @@ export const validateResetToken = async (
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid or expired token"
+      });
     }
 
-    res.json({ message: "Token is valid" });
+    res.json({
+      success: true,
+      message: "Token is valid" 
+    });
   } catch (err) {
     next(err);
   }
@@ -135,7 +158,10 @@ export const resetUserPassword = async (
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid or expired token"
+      });
     }
 
     user.password = await bcrypt.hash(password, 10);
@@ -144,7 +170,10 @@ export const resetUserPassword = async (
 
     await user.save();
 
-    res.json({ message: "Password reset successful" });
+    res.json({ 
+      success: true,
+      message: "Password reset successful"
+    });
   } catch (err) {
     next(err);
   }

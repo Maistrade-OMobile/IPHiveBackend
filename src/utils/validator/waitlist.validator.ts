@@ -5,7 +5,7 @@ export const createWaitlistValidator = [
     .notEmpty().withMessage("Full name is required")
     .isLength({ max: 50 }).withMessage("Name cannot be more than 50 characters"),
 
-  body("emailAddress")
+  body("email")
     .notEmpty().withMessage("Email address is required")
     .isEmail().withMessage("Please provide a valid email"),
 

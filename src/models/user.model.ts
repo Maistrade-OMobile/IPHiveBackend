@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 export interface IUser extends mongoose.Document {
   fullName: string;
-  emailAddress: string;
+  email: string;
   emailVerified: boolean;
   role?:string,
   password?: string;
@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema<IUser>(
       trim: true,
       maxlength: [50, 'Name cannot be more than 50 characters'],
     },
-    emailAddress: {
+    email: {
       type: String,
       required: [true, 'Please provide an email'],
       match: [

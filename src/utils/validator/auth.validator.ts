@@ -6,7 +6,7 @@ export const registerUserValidator = [
     .isString().withMessage("Full name must be a string")
     .isLength({ max: 50 }).withMessage("Full name cannot be more than 50 characters"),
 
-  body("emailAddress")
+  body("email")
     .notEmpty().withMessage("Email is required")
     .isEmail().withMessage("Please provide a valid email")
     .normalizeEmail(),
@@ -27,7 +27,7 @@ export const registerUserValidator = [
 ];
 
 export const loginUserValidator = [
-  body("emailAddress")
+  body("email")
     .notEmpty().withMessage("Email is required")
     .isEmail().withMessage("Please provide a valid email")
     .normalizeEmail(),
@@ -37,7 +37,7 @@ export const loginUserValidator = [
 ];
 
 export const sendResetEmailValidator = [
-  body("emailAddress")
+  body("email")
     .notEmpty().withMessage("Email is required")
     .isEmail().withMessage("Please provide a valid email")
     .normalizeEmail(),
