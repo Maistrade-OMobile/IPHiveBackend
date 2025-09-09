@@ -1,8 +1,6 @@
 import { Router } from "express";
-import {
-  getWaitlists,
-  createWaitlist
-} from "../controllers/waitlist.controller";
+import authRouter from "./auth.route";
+import waitlistRouter from "./waitlist.route";
 
 const router = Router();
 
@@ -10,12 +8,11 @@ const router = Router();
 router.get("/", (req, res) => {
   res.json({
     status: "success",
-    message: "Backend is up and running"
+    message: "Backend is up and running",
   });
 });
 
-router.get("/waitlists", getWaitlists);
-
-router.post("/waitlist", createWaitlist);
+router.use("/auth", authRouter);
+router.use("/waitlist", waitlistRouter);
 
 export default router;

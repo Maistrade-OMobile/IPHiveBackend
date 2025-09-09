@@ -32,12 +32,12 @@ export const createWaitlist = async (
       });
     }
 
-    const { fullName, emailAddress, role, receiveEmailUpdates } = req.body;
+    const { fullName, email, role, receiveEmailUpdates } = req.body;
 
-    if (!fullName || !emailAddress || !role) {
+    if (!fullName || !email || !role) {
       return res.status(400).json({
         success: false,
-        message: "Incomplete request - emailAddress, name or role not provided"
+        message: "Incomplete request - email, name or role not provided"
       });
     }
     
@@ -49,9 +49,9 @@ export const createWaitlist = async (
     }
 
 
-    let waitlistUser = await Waitlist.findOne({ emailAddress });
+    let waitlistUser = await Waitlist.findOne({ email });
     if (!waitlistUser) {
-      waitlistUser = new Waitlist({ fullName, emailAddress, role, receiveEmailUpdates });
+      waitlistUser = new Waitlist({ fullName, email, role, receiveEmailUpdates });
       await waitlistUser.save();
     }
 
