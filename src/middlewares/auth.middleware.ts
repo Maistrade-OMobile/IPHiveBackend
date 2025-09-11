@@ -13,29 +13,32 @@ export default function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({
-      success: false,
-      message: "Missing or invalid Auth token"
-    });
-  }
-
-  const token = authHeader.split(" ")[1];
-
+  // const authHeader = req.headers.authorization;
   try {
-    const { SECRET_KEY = "" } = process.env;
-    const decoded = jwt.verify(token, SECRET_KEY) as User;
+    const { token } = req.cookies;
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Missing or invalid Auth token"
+      });
+    }
+
+    const { JWT_SECRET } = process.env;
+
+
+    if (!JWT_SECRET) {
+      throw new Error("empty JWT_SECRET ");
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as User;
+    console.log("decoded", decoded);
+
     if (decoded) {
       req.user = decoded;
       next();
     }
   } catch (err) {
     console.error(err);
-    return res.status(401).json({
-      success: false,
-      message: "invalid or expired token"
-    });
   }
 }

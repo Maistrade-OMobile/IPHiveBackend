@@ -1,6 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../models/user.model";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+import User from "../models/user.model";
+
+const { JWT_SECRET } = process.env;
+if (!JWT_SECRET) {
+  throw new Error("empty JWT_SECRET ");
+}
 
 export const registerUser = async (
   req: Request,
@@ -13,8 +20,8 @@ export const registerUser = async (
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({
-         success: false,
-         message: "Email already registered"
+        success: false,
+        message: "Email already registered"
       });
     }
 
@@ -24,24 +31,32 @@ export const registerUser = async (
       fullName,
       email,
       role: role,
-      password: hashed,
+      password: hashed
+    });
+    const token = jwt.sign({ userId: user._id, email }, JWT_SECRET, {
+      expiresIn: "1h"
     });
 
-    res.status(201).json({
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 1000
+    });
+
+    return res.status(201).json({
       success: true,
       message: "User registered successfully",
       user: {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
-        role: user.role,
-      },
+        role: user.role
+      }
     });
   } catch (err) {
     next(err);
   }
 };
-
 
 export const loginUser = async (
   req: Request,
@@ -55,7 +70,7 @@ export const loginUser = async (
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Invalid email or password" 
+        message: "Invalid email or password"
       });
     }
 
@@ -63,19 +78,28 @@ export const loginUser = async (
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: "Invalid email or password" 
+        message: "Invalid email or password"
       });
     }
 
-    // ( pending ) -> generate JWT
-    res.json({
+    const token = jwt.sign({ userId: user._id, email }, JWT_SECRET, {
+      expiresIn: "1h"
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 1000
+    });
+
+    return res.json({
       success: true,
       message: "Login successful",
       user: {
         id: user._id,
         fullName: user.fullName,
-        email: user.email,
-      },
+        email: user.email
+      }
     });
   } catch (err) {
     next(err);
@@ -105,9 +129,10 @@ export const sendResetEmail = async (
 
     // ( Pending ) -> Email Logic
     res.json({
-       success: true,
-       message: "Password reset email sent", token 
-      });
+      success: true,
+      message: "Password reset email sent",
+      token
+    });
   } catch (err) {
     next(err);
   }
@@ -119,15 +144,15 @@ export const validateResetToken = async (
   next: NextFunction
 ) => {
   try {
-    const { token } = req.params; 
+    const { token } = req.params;
 
     const user = await User.findOne({
       resetPasswordToken: token,
-      resetTokenExpiry: { $gt: Date.now() },
+      resetTokenExpiry: { $gt: Date.now() }
     });
 
     if (!user) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
         message: "Invalid or expired token"
       });
@@ -135,13 +160,12 @@ export const validateResetToken = async (
 
     res.json({
       success: true,
-      message: "Token is valid" 
+      message: "Token is valid"
     });
   } catch (err) {
     next(err);
   }
 };
-
 
 export const resetUserPassword = async (
   req: Request,
@@ -149,17 +173,17 @@ export const resetUserPassword = async (
   next: NextFunction
 ) => {
   try {
-    const { token } = req.params; 
-    const { password } = req.body; 
+    const { token } = req.params;
+    const { password } = req.body;
 
     const user = await User.findOne({
       resetPasswordToken: token,
-      resetTokenExpiry: { $gt: Date.now() },
+      resetTokenExpiry: { $gt: Date.now() }
     });
 
     if (!user) {
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: "Invalid or expired token"
       });
     }
@@ -170,7 +194,7 @@ export const resetUserPassword = async (
 
     await user.save();
 
-    res.json({ 
+    res.json({
       success: true,
       message: "Password reset successful"
     });
@@ -178,4 +202,3 @@ export const resetUserPassword = async (
     next(err);
   }
 };
-

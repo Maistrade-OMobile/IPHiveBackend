@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema<IUser>(
     },
     role: {
         type: String,
-        enum: ['innovator', 'investor', 'IPTTO Staff', 'Admin'],
+        enum: ['innovator', 'investor', 'iptto staff', 'admin'],
         default: 'innovator',
     },
     password: {

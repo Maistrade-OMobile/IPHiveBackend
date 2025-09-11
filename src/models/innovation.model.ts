@@ -1,19 +1,19 @@
 import { model, Schema, Types, Document } from "mongoose";
 
-export interface IIntellectualProperty extends Document {
+export interface IInnovation extends Document {
   type: "patent" | "trademark" | "copyright" | "design" | string;
   title: string;
   description?: string;
   status: "pending" | "filed" | "approved" | "rejected";
   applicationNumber?: string;
-  owners: Types.ObjectId[];
+  owner: Types.ObjectId;
   jurisdiction: string;
   // inventors: Types.ObjectId[];
   filingDate: Date;
   expirydate: Date;
   relatedDocuments: string[];
 }
-const intellectualPropertySchema = new Schema<IIntellectualProperty>(
+const innovationSchema = new Schema<IInnovation>(
   {
     type: {
       type: String,
@@ -31,7 +31,7 @@ const intellectualPropertySchema = new Schema<IIntellectualProperty>(
     },
     status: {
       type: String,
-      required: true,
+      default: "pending",
       enum: ["pending", "filed", "approved", "rejected"],
       index: true
     },
@@ -41,13 +41,11 @@ const intellectualPropertySchema = new Schema<IIntellectualProperty>(
     applicationNumber: {
       type: String
     },
-    owners: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "users",
-        required: true
-      }
-    ],
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      required: true
+    },
     filingDate: {
       type: Date,
       index: true
@@ -58,9 +56,6 @@ const intellectualPropertySchema = new Schema<IIntellectualProperty>(
   { timestamps: true }
 );
 
-const IntellectualProperty = model(
-  "intellectualProperty",
-  intellectualPropertySchema
-);
+const Innovation = model("innovation", innovationSchema);
 
-export default IntellectualProperty;
+export default Innovation;
