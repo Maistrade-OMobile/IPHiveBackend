@@ -13,7 +13,6 @@ export default function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  // const authHeader = req.headers.authorization;
   try {
     const { token } = req.cookies;
 
@@ -32,7 +31,6 @@ export default function authMiddleware(
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as User;
-    console.log("decoded", decoded);
 
     if (decoded) {
       req.user = decoded;

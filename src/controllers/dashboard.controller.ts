@@ -10,6 +10,10 @@ interface InnovationBody {
   description: string;
 }
 
+// interface Files {
+//   relatedDocuments?: File[];
+// }
+
 interface InnovationQuery {
   type?: string | string[];
   status?: string | string[];
@@ -23,6 +27,13 @@ export const submitInnovation = async (
   next: NextFunction
 ): Promise<Response | void> => {
   try {
+    const relatedDocuments = req.files as Express.Multer.File[];
+
+    if (!relatedDocuments || relatedDocuments.length === 0)
+      throw new Error("No files uploaded");
+
+    const relatedDocumentsUrls = relatedDocuments.map((file) => file.path);
+   
     const { body, user } = req;
 
     if (!user) {
@@ -42,14 +53,13 @@ export const submitInnovation = async (
         message: "invalid userId"
       });
     }
-    // const { relatedDocuments } = req.files;
-    // Run document upload logic
 
     const newInnovation = new Innovation({
       type,
       title,
       description,
-      owner: currentUser._id
+      owner: currentUser._id,
+      relatedDocuments: relatedDocumentsUrls
     });
 
     await newInnovation.save();

@@ -21,7 +21,7 @@ const dashboardRouter = Router();
 dashboardRouter.use(authMiddleware);
 dashboardRouter.post(
   "/",
-  // upload.array("relatedDocuments", 10),
+  upload.array("relatedDocuments", 10),
   submitInnovation
 );
 
