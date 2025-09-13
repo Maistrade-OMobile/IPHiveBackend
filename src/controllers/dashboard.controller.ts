@@ -10,9 +10,14 @@ interface InnovationBody {
   description: string;
 }
 
-// interface Files {
-//   relatedDocuments?: File[];
-// }
+interface InnovationFilters {
+  type?: string | string[];
+  status?: string | string[];
+  filingDate?: {
+    $lte?: string | Date;
+    $gte?: string | Date;
+  };
+}
 
 interface InnovationQuery {
   type?: string | string[];
@@ -33,7 +38,7 @@ export const submitInnovation = async (
       throw new Error("No files uploaded");
 
     const relatedDocumentsUrls = relatedDocuments.map((file) => file.path);
-   
+
     const { body, user } = req;
 
     if (!user) {
@@ -46,19 +51,11 @@ export const submitInnovation = async (
     const { type, title, description } = body as InnovationBody;
     const { userId } = user;
 
-    const currentUser = await User.findOne({ _id: userId });
-    if (!userId || !currentUser) {
-      return res.status(400).json({
-        success: false,
-        message: "invalid userId"
-      });
-    }
-
     const newInnovation = new Innovation({
       type,
       title,
       description,
-      owner: currentUser._id,
+      owner: userId,
       relatedDocuments: relatedDocumentsUrls
     });
 
@@ -107,14 +104,6 @@ export const getInnovations = async (
       });
     }
 
-    interface InnovationFilters {
-      type?: string | string[];
-      status?: string | string[];
-      filingDate?: {
-        $lte?: string | Date;
-        $gte?: string | Date;
-      };
-    }
     const filters: InnovationFilters = {};
 
     if (type) filters.type = type;

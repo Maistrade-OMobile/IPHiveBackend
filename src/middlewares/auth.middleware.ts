@@ -1,14 +1,17 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-type User = {
+
+import User from "../models/user.model.js";
+
+type UserType = {
   userId: string;
   email: string;
 };
 export interface JWTRequest extends Request {
-  user?: User;
+  user?: UserType;
 }
 
-export default function authMiddleware(
+export default async function authMiddleware(
   req: JWTRequest,
   res: Response,
   next: NextFunction
@@ -25,18 +28,26 @@ export default function authMiddleware(
 
     const { JWT_SECRET } = process.env;
 
-
     if (!JWT_SECRET) {
       throw new Error("empty JWT_SECRET ");
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as User;
+    const decoded = jwt.verify(token, JWT_SECRET) as UserType;
+
+    const { userId } = decoded;
+    const currentUser = await User.findOne({ _id: userId });
+    if (!userId || !currentUser) {
+      return res.status(400).json({
+        success: false,
+        message: "invalid userId"
+      });
+    }
 
     if (decoded) {
       req.user = decoded;
       next();
     }
   } catch (err) {
-    console.error(err);
+    next(err);
   }
 }
