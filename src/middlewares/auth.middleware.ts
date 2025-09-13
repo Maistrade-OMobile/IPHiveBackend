@@ -17,7 +17,15 @@ export default async function authMiddleware(
   next: NextFunction
 ) {
   try {
-    const { token } = req.cookies;
+    const authHeader = req.headers.authorization;
+    if(!authHeader){
+      return res.status(400).json({
+        success: false,
+        message: "Missing Auth Header"
+      });
+    }
+
+    const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({
@@ -32,10 +40,12 @@ export default async function authMiddleware(
       throw new Error("empty JWT_SECRET ");
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as UserType;
+    const user = jwt.verify(token, JWT_SECRET) as UserType;
 
-    const { userId } = decoded;
+    const { userId } = user;
+
     const currentUser = await User.findOne({ _id: userId });
+
     if (!userId || !currentUser) {
       return res.status(400).json({
         success: false,
@@ -43,10 +53,8 @@ export default async function authMiddleware(
       });
     }
 
-    if (decoded) {
-      req.user = decoded;
-      next();
-    }
+    req.user = user;
+    next();
   } catch (err) {
     next(err);
   }
