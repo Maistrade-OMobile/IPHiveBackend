@@ -8,7 +8,6 @@ export interface IInnovation extends Document {
   applicationNumber?: string;
   owner: Types.ObjectId;
   jurisdiction: string;
-  // inventors: Types.ObjectId[];
   filingDate: Date;
   expirydate: Date;
   relatedDocuments: string[];
